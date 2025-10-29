@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>温馨提示</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: "微软雅黑", sans-serif;
+        }
+        
+        /* 弹窗样式 - 模拟原Tkinter窗口 */
+        .tip-window {
+            position: absolute;
+            width: 250px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            text-align: center;
+            font-size: 16px;
+            transition: all 0.3s ease-out;
+            opacity: 0;
+            transform: scale(0.8);
+            z-index: 10;
+        }
+        
+        /* 弹窗显示动画 */
+        .tip-window.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 提示文字列表（与原Python代码一致）
+        const tips = [
+            '多喝水哦~', '保持微笑呀', '每天都要元气满满',
+            '记得吃水果~', '保持好心情', '好好爱自己', '我想你了',
+            '梦想成真', '期待下一次见面', '金榜题名',
+            '顺顺利利', '早点休息哦', '愿所有烦恼都被送走',
+            '别熬夜', '今天过得开心嘛', '天冷了，多穿衣服',
+            '阳光正好，你也很好', '别急，一切都会如愿', '你值得被世界温柔以待',
+            '慢慢来，比较快', '风会替我拥抱你', '今晚星星也在为你眨眼',
+            '把烦恼清零，把快乐加满', '你笑起来的样子真好看', '做自己的小太阳',
+            '所有好事都在路上', '愿今夜好梦，醒来有糖', '你比自己想象的更勇敢',
+            '累了就歇会儿，别硬撑', '世界很大，幸好有你', '把普通的日子过得浪漫些'
+        ];
+
+        // 背景颜色列表（与原Python代码对应）
+        const bgColors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender',
+            'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine',
+            'mistyrose', 'honeydew', 'lavenderblush', 'oldlace'
+        ];
+
+        // 获取屏幕尺寸（适配手机）
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const windowWidth = 250;
+        const windowHeight = 80;
+
+        // 生成随机位置（确保弹窗完全显示在屏幕内）
+        function getRandomPosition() {
+            const maxX = screenWidth - windowWidth;
+            const maxY = screenHeight - windowHeight;
+            const x = Math.floor(Math.random() * maxX);
+            const y = Math.floor(Math.random() * maxY);
+            return { x, y };
+        }
+
+        // 创建单个提示弹窗
+        function createTipWindow() {
+            // 创建弹窗元素
+            const tipWindow = document.createElement('div');
+            tipWindow.className = 'tip-window';
+            
+            // 随机设置内容和样式
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            const { x, y } = getRandomPosition();
+            
+            // 应用样式
+            tipWindow.style.left = `${x}px`;
+            tipWindow.style.top = `${y}px`;
+            tipWindow.style.backgroundColor = bgColor;
+            tipWindow.textContent = tip;
+            
+            // 添加到页面
+            document.body.appendChild(tipWindow);
+            
+            // 触发显示动画
+            setTimeout(() => {
+                tipWindow.classList.add('show');
+            }, 10);
+            
+            // 弹窗自动关闭（避免手机屏幕被占满）
+            setTimeout(() => {
+                tipWindow.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(tipWindow);
+                }, 300);
+            }, 10000);
+        }
+
+        // 批量创建弹窗（模拟多线程效果）
+        let count = 0;
+        const totalWindows = 200; // 手机端适当减少数量，避免过于密集
+        const interval = setInterval(() => {
+            if (count < totalWindows) {
+                createTipWindow();
+                count++;
+            } else {
+                clearInterval(interval);
+                // 所有弹窗显示完毕后提示
+                setTimeout(() => {
+                    const finalTip = document.createElement('div');
+                    finalTip.style.position = 'fixed';
+                    finalTip.style.bottom = '20px';
+                    finalTip.style.left = '50%';
+                    finalTip.style.transform = 'translateX(-50%)';
+                    finalTip.style.padding = '10px 20px';
+                    finalTip.style.backgroundColor = 'lightpink';
+                    finalTip.style.borderRadius = '20px';
+                    finalTip.style.fontSize = '16px';
+                    finalTip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                    finalTip.textContent = '所有温馨提示已送达~ 💕';
+                    document.body.appendChild(finalTip);
+                }, 5000);
+            }
+        }, 100); // 每隔50ms弹出一个，模拟快速弹出效果
+    </script>
+</body>
+
+</html>
