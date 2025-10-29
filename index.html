@@ -13,7 +13,7 @@
             background-color: #f0f0f0;
             font-family: "微软雅黑", sans-serif;
         }
-        
+
         /* 弹窗样式 - 模拟原Tkinter窗口 */
         .tip-window {
             position: absolute;
@@ -28,15 +28,35 @@
             transform: scale(0.8);
             z-index: 10;
         }
-        
+
         /* 弹窗显示动画 */
         .tip-window.show {
             opacity: 1;
             transform: scale(1);
         }
+
+        /* 音乐状态提示（替代按钮，减少操作） */
+        .music-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 14px;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
+    <!-- 背景音乐元素（自动播放+单曲循环，结束后自动关闭） -->
+    <audio id="bg-music" preload="auto" loop>
+        <!-- 替换为转换后的 MP3 链接 -->
+        <source src="1.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+
     <script>
         // 提示文字列表（与原Python代码一致）
         const tips = [
@@ -65,6 +85,12 @@
         const windowWidth = 250;
         const windowHeight = 80;
 
+        // 音乐相关元素
+        const bgMusic = document.getElementById('bg-music');
+        const musicStatus = document.getElementById('music-status');
+        // 标记音乐是否已关闭（避免重复处理）
+        let isMusicClosed = false;
+
         // 生成随机位置（确保弹窗完全显示在屏幕内）
         function getRandomPosition() {
             const maxX = screenWidth - windowWidth;
@@ -79,26 +105,26 @@
             // 创建弹窗元素
             const tipWindow = document.createElement('div');
             tipWindow.className = 'tip-window';
-            
+
             // 随机设置内容和样式
             const tip = tips[Math.floor(Math.random() * tips.length)];
             const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
             const { x, y } = getRandomPosition();
-            
+
             // 应用样式
             tipWindow.style.left = `${x}px`;
             tipWindow.style.top = `${y}px`;
             tipWindow.style.backgroundColor = bgColor;
             tipWindow.textContent = tip;
-            
+
             // 添加到页面
             document.body.appendChild(tipWindow);
-            
+
             // 触发显示动画
             setTimeout(() => {
                 tipWindow.classList.add('show');
             }, 10);
-            
+
             // 弹窗自动关闭（避免手机屏幕被占满）
             setTimeout(() => {
                 tipWindow.classList.remove('show');
@@ -108,34 +134,66 @@
             }, 10000);
         }
 
-        // 批量创建弹窗（模拟多线程效果）
-        let count = 0;
-        const totalWindows = 200; // 手机端适当减少数量，避免过于密集
-        const interval = setInterval(() => {
-            if (count < totalWindows) {
-                createTipWindow();
-                count++;
-            } else {
-                clearInterval(interval);
-                // 所有弹窗显示完毕后提示
+        // 音乐播放结束后自动关闭逻辑
+        function handleMusicEnd() {
+            if (isMusicClosed) return; // 避免重复执行
+
+            bgMusic.pause(); // 暂停音乐
+            bgMusic.removeAttribute('loop'); // 取消循环
+            musicStatus.textContent = '音乐已结束'; // 更新状态提示
+
+            // 3秒后隐藏状态提示，保持界面简洁
+            setTimeout(() => {
+                musicStatus.style.opacity = '0';
                 setTimeout(() => {
-                    const finalTip = document.createElement('div');
-                    finalTip.style.position = 'fixed';
-                    finalTip.style.bottom = '20px';
-                    finalTip.style.left = '50%';
-                    finalTip.style.transform = 'translateX(-50%)';
-                    finalTip.style.padding = '10px 20px';
-                    finalTip.style.backgroundColor = 'lightpink';
-                    finalTip.style.borderRadius = '20px';
-                    finalTip.style.fontSize = '16px';
-                    finalTip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-                    finalTip.textContent = '所有温馨提示已送达~ 💕';
-                    document.body.appendChild(finalTip);
-                }, 5000);
-            }
-        }, 100); // 每隔50ms弹出一个，模拟快速弹出效果
+                    musicStatus.style.display = 'none';
+                }, 300);
+            }, 3000);
+
+            isMusicClosed = true;
+        }
+
+        // 页面加载完成后执行
+        window.addEventListener('load', () => {
+            // 1. 尝试自动播放音乐（处理手机浏览器限制）
+            document.body.addEventListener('click', () => {
+                if (bgMusic.paused && !isMusicClosed) {
+                    bgMusic.play().catch(() => {
+                        musicStatus.textContent = '点击屏幕任意位置播放音乐';
+                    });
+                }
+            }, { once: true }); // 只触发一次用户交互检测
+
+            // 2. 绑定音乐结束事件
+            bgMusic.addEventListener('ended', handleMusicEnd);
+
+            // 3. 批量创建弹窗（模拟多线程效果）
+            let count = 0;
+            const totalWindows = 100;
+            const interval = setInterval(() => {
+                if (count < totalWindows) {
+                    createTipWindow();
+                    count++;
+                } else {
+                    clearInterval(interval);
+                    // 所有弹窗显示完毕后提示
+                    setTimeout(() => {
+                        const finalTip = document.createElement('div');
+                        finalTip.style.position = 'fixed';
+                        finalTip.style.bottom = '20px';
+                        finalTip.style.left = '50%';
+                        finalTip.style.transform = 'translateX(-50%)';
+                        finalTip.style.padding = '10px 20px';
+                        finalTip.style.backgroundColor = 'lightpink';
+                        finalTip.style.borderRadius = '20px';
+                        finalTip.style.fontSize = '16px';
+                        finalTip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                        finalTip.textContent = '所有温馨提示已送达~ 💕';
+                        document.body.appendChild(finalTip);
+                    }, 5000);
+                }
+            }, 100);
+        });
     </script>
 </body>
-
 </html>
-
