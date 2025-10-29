@@ -105,12 +105,12 @@
                 setTimeout(() => {
                     document.body.removeChild(tipWindow);
                 }, 300);
-            }, 3000);
+            }, 5000);
         }
 
         // 批量创建弹窗（模拟多线程效果）
         let count = 0;
-        const totalWindows = 100; // 手机端适当减少数量，避免过于密集
+        const totalWindows = 200; // 手机端适当减少数量，避免过于密集
         const interval = setInterval(() => {
             if (count < totalWindows) {
                 createTipWindow();
@@ -136,4 +136,5 @@
         }, 50); // 每隔50ms弹出一个，模拟快速弹出效果
     </script>
 </body>
+
 </html>
