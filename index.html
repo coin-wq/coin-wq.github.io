@@ -105,7 +105,7 @@
                 setTimeout(() => {
                     document.body.removeChild(tipWindow);
                 }, 300);
-            }, 5000);
+            }, 10000);
         }
 
         // 批量创建弹窗（模拟多线程效果）
@@ -131,10 +131,11 @@
                     finalTip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
                     finalTip.textContent = '所有温馨提示已送达~ 💕';
                     document.body.appendChild(finalTip);
-                }, 3000);
+                }, 5000);
             }
-        }, 50); // 每隔50ms弹出一个，模拟快速弹出效果
+        }, 100); // 每隔50ms弹出一个，模拟快速弹出效果
     </script>
 </body>
 
 </html>
+
