@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>温馨提示</title>
+    <title>温馨小贴士</title>
     <style>
         body {
             margin: 0;
@@ -12,8 +12,54 @@
             overflow: hidden;
             background-color: #f0f0f0;
             font-family: "微软雅黑", sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
-
+        
+        /* 启动页面样式 */
+        .start-screen {
+            text-align: center;
+            padding: 20px;
+            max-width: 90%;
+            z-index: 100;
+        }
+        
+        .start-screen h1 {
+            color: #ff6b6b;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .start-screen p {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .start-button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            font-family: "微软雅黑", sans-serif;
+        }
+        
+        .start-button:hover {
+            background-color: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+        }
+        
         /* 弹窗样式 - 模拟原Tkinter窗口 */
         .tip-window {
             position: absolute;
@@ -27,35 +73,126 @@
             opacity: 0;
             transform: scale(0.8);
             z-index: 10;
+            cursor: pointer;
         }
-
+        
         /* 弹窗显示动画 */
         .tip-window.show {
             opacity: 1;
             transform: scale(1);
         }
 
-        /* 音乐状态提示（替代按钮，减少操作） */
+        /* 音乐状态提示 */
         .music-status {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 5px 10px;
+            padding: 8px 15px;
             border-radius: 20px;
             background-color: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             font-size: 14px;
             z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .music-icon {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* 结束提示 */
+        .final-tip {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 25px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 20px;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 100;
+        }
+        
+        .final-tip.show {
+            opacity: 1;
+        }
+        
+        /* 音乐控制按钮 */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .music-control svg {
+            width: 20px;
+            height: 20px;
+            fill: #ff6b6b;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .start-screen h1 {
+                font-size: 1.8rem;
+            }
+            
+            .start-screen p {
+                font-size: 1rem;
+            }
+            
+            .tip-window {
+                width: 200px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 背景音乐元素（自动播放+单曲循环，结束后自动关闭） -->
+    <!-- 启动页面 -->
+    <div class="start-screen" id="startScreen">
+        <h1>温馨小贴士</h1>
+        <p>这里有一些温暖的话语想要送给你<br>点击下方按钮开始接收美好祝福</p>
+        <button class="start-button" id="startButton">开启温馨时刻</button>
+    </div>
+
+    <!-- 背景音乐元素 -->
     <audio id="bg-music" preload="auto" loop>
-        <!-- 替换为转换后的 MP3 链接 -->
+        <!-- 替换为您的音乐文件路径 -->
         <source src="1.mp3" type="audio/mpeg">
         您的浏览器不支持音频播放
     </audio>
+
+    <!-- 音乐状态提示 -->
+    <div class="music-status" id="musicStatus">
+        <svg class="music-icon" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+        <span>音乐播放中</span>
+    </div>
+
+    <!-- 音乐控制按钮 -->
+    <div class="music-control" id="musicControl">
+        <svg viewBox="0 0 24 24">
+            <path d="M6 6h4v12H6zm8 0h4v12h-4z"/>
+        </svg>
+    </div>
 
     <script>
         // 提示文字列表（与原Python代码一致）
@@ -85,11 +222,17 @@
         const windowWidth = 250;
         const windowHeight = 80;
 
-        // 音乐相关元素
+        // 获取DOM元素
+        const startScreen = document.getElementById('startScreen');
+        const startButton = document.getElementById('startButton');
         const bgMusic = document.getElementById('bg-music');
-        const musicStatus = document.getElementById('music-status');
-        // 标记音乐是否已关闭（避免重复处理）
+        const musicStatus = document.getElementById('musicStatus');
+        const musicControl = document.getElementById('musicControl');
+        
+        // 标记音乐是否已关闭
         let isMusicClosed = false;
+        // 标记是否已开始
+        let hasStarted = false;
 
         // 生成随机位置（确保弹窗完全显示在屏幕内）
         function getRandomPosition() {
@@ -105,43 +248,71 @@
             // 创建弹窗元素
             const tipWindow = document.createElement('div');
             tipWindow.className = 'tip-window';
-
+            
             // 随机设置内容和样式
             const tip = tips[Math.floor(Math.random() * tips.length)];
             const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
             const { x, y } = getRandomPosition();
-
+            
             // 应用样式
             tipWindow.style.left = `${x}px`;
             tipWindow.style.top = `${y}px`;
             tipWindow.style.backgroundColor = bgColor;
             tipWindow.textContent = tip;
-
+            
             // 添加到页面
             document.body.appendChild(tipWindow);
-
+            
             // 触发显示动画
             setTimeout(() => {
                 tipWindow.classList.add('show');
             }, 10);
-
-            // 弹窗自动关闭（避免手机屏幕被占满）
-            setTimeout(() => {
+            
+            // 点击弹窗关闭
+            tipWindow.addEventListener('click', () => {
                 tipWindow.classList.remove('show');
                 setTimeout(() => {
-                    document.body.removeChild(tipWindow);
+                    if (tipWindow.parentNode) {
+                        document.body.removeChild(tipWindow);
+                    }
                 }, 300);
+            });
+            
+            // 弹窗自动关闭（避免手机屏幕被占满）
+            setTimeout(() => {
+                if (tipWindow.parentNode) {
+                    tipWindow.classList.remove('show');
+                    setTimeout(() => {
+                        if (tipWindow.parentNode) {
+                            document.body.removeChild(tipWindow);
+                        }
+                    }, 300);
+                }
             }, 10000);
+        }
+
+        // 播放音乐
+        function playMusic() {
+            if (isMusicClosed) return;
+            
+            bgMusic.play().then(() => {
+                musicStatus.textContent = '音乐播放中';
+                musicStatus.style.display = 'flex';
+            }).catch(error => {
+                console.log('自动播放被阻止:', error);
+                musicStatus.textContent = '点击播放音乐';
+                musicStatus.style.display = 'flex';
+            });
         }
 
         // 音乐播放结束后自动关闭逻辑
         function handleMusicEnd() {
             if (isMusicClosed) return; // 避免重复执行
-
+            
             bgMusic.pause(); // 暂停音乐
             bgMusic.removeAttribute('loop'); // 取消循环
             musicStatus.textContent = '音乐已结束'; // 更新状态提示
-
+            
             // 3秒后隐藏状态提示，保持界面简洁
             setTimeout(() => {
                 musicStatus.style.opacity = '0';
@@ -149,25 +320,22 @@
                     musicStatus.style.display = 'none';
                 }, 300);
             }, 3000);
-
+            
             isMusicClosed = true;
         }
 
-        // 页面加载完成后执行
-        window.addEventListener('load', () => {
-            // 1. 尝试自动播放音乐（处理手机浏览器限制）
-            document.body.addEventListener('click', () => {
-                if (bgMusic.paused && !isMusicClosed) {
-                    bgMusic.play().catch(() => {
-                        musicStatus.textContent = '点击屏幕任意位置播放音乐';
-                    });
-                }
-            }, { once: true }); // 只触发一次用户交互检测
-
-            // 2. 绑定音乐结束事件
-            bgMusic.addEventListener('ended', handleMusicEnd);
-
-            // 3. 批量创建弹窗（模拟多线程效果）
+        // 开始显示弹窗
+        function startTips() {
+            if (hasStarted) return;
+            hasStarted = true;
+            
+            // 隐藏启动页面
+            startScreen.style.display = 'none';
+            
+            // 播放音乐
+            playMusic();
+            
+            // 批量创建弹窗（模拟多线程效果）
             let count = 0;
             const totalWindows = 100;
             const interval = setInterval(() => {
@@ -179,20 +347,46 @@
                     // 所有弹窗显示完毕后提示
                     setTimeout(() => {
                         const finalTip = document.createElement('div');
-                        finalTip.style.position = 'fixed';
-                        finalTip.style.bottom = '20px';
-                        finalTip.style.left = '50%';
-                        finalTip.style.transform = 'translateX(-50%)';
-                        finalTip.style.padding = '10px 20px';
-                        finalTip.style.backgroundColor = 'lightpink';
-                        finalTip.style.borderRadius = '20px';
-                        finalTip.style.fontSize = '16px';
-                        finalTip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                        finalTip.className = 'final-tip';
                         finalTip.textContent = '所有温馨提示已送达~ 💕';
                         document.body.appendChild(finalTip);
+                        
+                        setTimeout(() => {
+                            finalTip.classList.add('show');
+                        }, 100);
                     }, 5000);
                 }
             }, 100);
+        }
+
+        // 页面加载完成后执行
+        window.addEventListener('load', () => {
+            // 绑定开始按钮事件
+            startButton.addEventListener('click', startTips);
+            
+            // 绑定音乐控制按钮事件
+            musicControl.addEventListener('click', () => {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    musicStatus.textContent = '音乐播放中';
+                    musicStatus.style.display = 'flex';
+                    musicControl.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6h4v12H6zm8 0h4v12h-4z"/></svg>';
+                } else {
+                    bgMusic.pause();
+                    musicStatus.textContent = '音乐已暂停';
+                    musicControl.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                }
+            });
+            
+            // 绑定音乐结束事件
+            bgMusic.addEventListener('ended', handleMusicEnd);
+            
+            // 处理触摸/点击事件以触发音频播放
+            document.body.addEventListener('click', () => {
+                if (!hasStarted && bgMusic.paused) {
+                    playMusic();
+                }
+            });
         });
     </script>
 </body>
